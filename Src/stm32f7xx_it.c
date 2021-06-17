@@ -260,18 +260,7 @@ void EXTI15_10_IRQHandler(void)
 void DMA2_Stream0_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA2_Stream0_IRQn 0 */
-HAL_GPIO_TogglePin(Output1_GPIO_Port, Output1_Pin);
-  if (READ_BIT(DMA2->LISR, DMA_LISR_TCIF0))
-  {
-    DMA2->LIFCR = DMA_FLAG_TEIF0_4 << hdma_adc1.StreamIndex;
 
-  }
-  if (READ_BIT(DMA2->LISR, DMA_LISR_HTIF0))
-  {
-    DMA2->LIFCR = DMA_FLAG_TCIF0_4 << hdma_adc1.StreamIndex;
-  }
-
-  dc_motor_poll();
   /* USER CODE END DMA2_Stream0_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_adc1);
   /* USER CODE BEGIN DMA2_Stream0_IRQn 1 */

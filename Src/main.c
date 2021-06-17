@@ -119,7 +119,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     canopen_link_poll();
-    //dc_motor_poll();
+    dc_motor_poll();
     module_poll();
   }
   /* USER CODE END 3 */

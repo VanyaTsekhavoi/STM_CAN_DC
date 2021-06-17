@@ -1,6 +1,3 @@
-INCLUDE ldscript/memory.ld
-REGION_ALIAS("FLASH", AFLASH)
-
 /* Define output sections */
 SECTIONS
 {
@@ -13,17 +10,6 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  .branch :
-  {
-    *(.branch)
-    . = ALIGN(4);
-  } >FLASH 
-
-  .header :
-  {
-	KEEP(*(.header))
-  } >FLASH
-
   .config_ldr (NOLOAD) :
   {
 	KEEP(*(.config_ldr))
@@ -34,6 +20,11 @@ SECTIONS
 	KEEP(*(.config_app))
   } >CAFLASH
 
+  .dtcm (NOLOAD) :
+  {
+	KEEP(*(.dtcm))
+  } >DTCM
+  
   /* The program code and other data goes into FLASH */
   .text :
   {
@@ -57,6 +48,9 @@ SECTIONS
     . = ALIGN(4);
     *(.rodata)         /* .rodata sections (constants, strings, etc.) */
     *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */
+    . = ALIGN(4);
+	PROVIDE(__fonts_mem__ = .);
+    KEEP(*(.fonts))
     . = ALIGN(4);
   } >FLASH
 

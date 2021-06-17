@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="Nucleo_project.xdd" fileCreator="IvTs" fileCreationDate="2021-04-08" fileCreationTime="16:41:25.0000000+03:00" fileModifiedBy="" fileModificationDate="2021-04-24" fileModificationTime="13:29:27.8689610+03:00" fileVersion="-" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="Nucleo_project.xdd" fileCreator="IvTs" fileCreationDate="2021-04-08" fileCreationTime="16:41:25.0000000+03:00" fileModifiedBy="" fileModificationDate="2021-06-17" fileModificationTime="20:05:50.6228000+03:00" fileVersion="-" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>CANopenNode</q1:vendorName>
         <q1:vendorID></q1:vendorID>
@@ -935,7 +935,7 @@ bit 24-31: set to 0</description>
           <q1:parameter uniqueID="UID_SUB_101601" access="readWrite">
             <label lang="en">Consumer heartbeat time</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_101602" access="readWrite">
             <label lang="en">Consumer heartbeat time</label>
@@ -989,7 +989,7 @@ bit 0-31: Manufacturer specific</description>
           <q1:parameter uniqueID="UID_SUB_101802">
             <label lang="en">Product code</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="1" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_101803">
             <label lang="en">Revision number</label>
@@ -1806,7 +1806,7 @@ bit 16-31: index from OD</description>
           <q1:parameter uniqueID="UID_SUB_1A0100" access="readWrite">
             <label lang="en">Number of mapped objects</label>
             <USINT />
-            <q1:defaultValue value="2" />
+            <q1:defaultValue value="1" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0101" access="readWrite">
             <label lang="en">mapped object 1</label>
@@ -1816,7 +1816,7 @@ bit 16-31: index from OD</description>
           <q1:parameter uniqueID="UID_SUB_1A0102" access="readWrite">
             <label lang="en">mapped object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x64010210" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0103" access="readWrite">
             <label lang="en">mapped object 3</label>
@@ -2968,7 +2968,7 @@ Trigger time - If integer value passes 'TraceConfig-&gt;threshold', then time is
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="Nucleo_project.xdd" fileCreator="IvTs" fileCreationDate="2021-04-08" fileCreationTime="16:41:25.0000000+03:00" fileModificationDate="2021-04-24" fileModificationTime="13:29:27.8689610+03:00" fileVersion="-" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="Nucleo_project.xdd" fileCreator="IvTs" fileCreationDate="2021-04-08" fileCreationTime="16:41:25.0000000+03:00" fileModificationDate="2021-06-17" fileModificationTime="20:05:50.6228000+03:00" fileVersion="-" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />

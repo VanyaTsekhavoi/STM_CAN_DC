@@ -1,6 +1,7 @@
 #include "canopen_link.h"
 #include "can.h"
 #include "platform_reset.h"
+#include "co_storage.h"
 #include "CO_OD.h"
 
 static inline void timebase_init()
@@ -44,6 +45,12 @@ void canopen_link_init()
 
 	/* Configure microcontroller. */
 	const int canbr[] = {1000, 800, 500, 250, 125, 100, 50, 20, 10, 2000, 3000};
+	extern const CO_OD_entry_t CO_OD[CO_OD_NoOfElements];
+
+	if (!co_read_entry(CO_OD, CO_OD_NoOfElements, OD_2101_CANNodeID))
+	{
+	}
+
 
 	if (CO_init((int32_t)CAN1, OD_CANNodeID, canbr[OD_CANBitRate]) != CO_ERROR_NO)
 	{

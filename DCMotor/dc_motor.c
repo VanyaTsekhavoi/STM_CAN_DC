@@ -2,8 +2,6 @@
 #include "math_macro.h"
 #include "pprof.h"
 #include "phase_filter.h"
-#include "stm32f7xx_ll_dma.h"
-
 //#include "stm32f767xx.h"
 //#include "stm32f7xx_hal_dma.h"
 #include "tim.h"
@@ -19,15 +17,15 @@ extern TIM_HandleTypeDef htim1;
 dc_motor_t dc_motor;
 
 //Transmission
-int16_t adc1[16] = {
+int16_t adc1[8] = {
     0,
 };
 uint16_t bufferData[2] = {
     0,
 };
 
-volatile int8_t halfTransferState = 0;
-volatile int8_t transferState = 0;
+int8_t halfTransferState = 0;
+int8_t transferState = 0;
 
 //PWM
 double timCounter = 0;
@@ -80,46 +78,7 @@ double bpVoltageKoeff = 0.004833984;
 
 static inline void dma_copy()
 {
-    
     /***** ADC conversion *****/
-
-    transferState = LL_DMA_IsActiveFlag_TC0(DMA2);
-    halfTransferState = LL_DMA_IsActiveFlag_HT0(DMA2);
-
-    if (halfTransferState)
-    {
-        DMA2->LIFCR = DMA_FLAG_HTIF0_4 << hdma_adc1.StreamIndex;
-    }
-
-    if (transferState)
-    {
-        DMA2->LIFCR = DMA_FLAG_TCIF0_4 << hdma_adc1.StreamIndex;
-    }
-
-    //Copy Data from registers
-    if (halfTransferState == 1)
-    {
-        bufferData[0] = bufferData[1] = 0;
-
-        for (int i = 0; i < 8; i += 2)
-        {
-            bufferData[0] += adc1[i];     // Current
-            bufferData[1] += adc1[i + 1]; // Voltage
-        }
-    }
-
-    if (transferState == 1)
-    {
-        bufferData[0] = bufferData[1] = 0;
-
-        for (int i = 8; i < 16; i += 2)
-        {
-            bufferData[0] += adc1[i];     // Current
-            bufferData[1] += adc1[i + 1]; // Voltage
-        }
-    }
-
-    /*
     transferState = READ_BIT(DMA2->LISR, DMA_LISR_TCIF0) == (DMA_LISR_TCIF0);
     halfTransferState = READ_BIT(DMA2->LISR, DMA_LISR_HTIF0) == (DMA_LISR_HTIF0);
 
@@ -147,11 +106,9 @@ static inline void dma_copy()
             bufferData[1] += adc1[i + 1]; // Voltage
         }
     }
-*/
-    bufferData[0] /= 4; // Current
-    bufferData[1] /= 4; // Voltage
-    
-    
+
+    bufferData[0] /= 2; // Current
+    bufferData[1] /= 2; // Voltage
 }
 
 static inline void current_offset()
@@ -166,7 +123,7 @@ static inline void current_offset()
         currentOffset += bufferData[0];
         curr++;
     }
-    instantCurrent = (bufferData[0] - currentOffset); // * currentSensorKoeff;
+    instantCurrent = (bufferData[0] - currentOffset) * currentSensorKoeff;
 }
 
 static inline void theoreticalAngle_Velocity()
@@ -213,8 +170,39 @@ static inline void theoreticalAngle_Velocity()
     instantVelocity = filter.we;
 }
 
-static inline void motor_control_loop()
+void dc_motor_init()
 {
+    /***** Init *****/
+
+    filterConfiguration.ki = 20000.0;
+    filterConfiguration.kp = 120.0;
+    filterConfiguration.w_max = 10000.0;
+
+    double timCounter = htim1.Init.Period;
+
+    /***** Start *****/
+
+    phase_filter_init(&filter);
+    pprof_init(&p);
+    HAL_ADC_Start_DMA(&hadc1, (uint32_t *)&adc1, 8);
+    TIM_CCxChannelCmd(htim1.Instance, TIM_CHANNEL_1, TIM_CCx_ENABLE);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+}
+
+void dc_motor_poll()
+{
+    /***** DMA transfer *****/
+
+    dma_copy();
+
+    /***** Current offset computing *****/
+
+    current_offset();
+
+    int PWM = TIM1->CCR1;
+    bPVoltage = bufferData[1] * bpVoltageKoeff;
+    instantVoltage = bPVoltage * PWM / (timCounter + 1);
+
     theoreticalAngle_Velocity();
     pprof_process(&p, ReqFFAngle, ReqFFVelocity, ReqFFAcceleration, sampleLength);
 
@@ -287,45 +275,6 @@ static inline void motor_control_loop()
                 TIM1->CCR2 = (timCounter + 1) / 2 + (timCounter + 1) * (requiredVoltage) / 2 / bPVoltage - 1;
             }
         }
-    }
-}
-
-void dc_motor_init()
-{
-    /***** Init *****/
-
-    filterConfiguration.ki = 20000.0;
-    filterConfiguration.kp = 120.0;
-    filterConfiguration.w_max = 10000.0;
-
-    double timCounter = htim1.Init.Period;
-
-    /***** Start *****/
-
-    phase_filter_init(&filter);
-    pprof_init(&p);
-    HAL_ADC_Start_DMA(&hadc1, (uint32_t *)&adc1, 16);
-    TIM_CCxChannelCmd(htim1.Instance, TIM_CHANNEL_1, TIM_CCx_ENABLE);
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-}
-
-void dc_motor_poll()
-{
-    /***** DMA transfer *****/
-
-    dma_copy();
-
-    /***** Current offset computing *****/
-
-    current_offset();
-
-    int PWM = TIM1->CCR1;
-    bPVoltage = bufferData[1] * bpVoltageKoeff;
-    instantVoltage = bufferData[1]; //bPVoltage * PWM / (timCounter + 1);
-
-    if (0)
-    {
-        motor_control_loop();
     }
 
     /***** Output *****/
